@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milotnt.mapper.CommentaryMapper">
+
+    <select id="selectAll" resultType="com.milotnt.pojo.Commentary">
+        SELECT *
+        FROM commentary
+        ORDER BY comment_date DESC
+    </select>
+
+    <insert id="insertCommentary" parameterType="com.milotnt.pojo.Commentary">
+        INSERT INTO commentary (member_account, comment_date, message)
+        VALUES (#{memberAccount}, #{commentDate}, #{message})
+    </insert>
+
+    <delete id="deleteCommentary">
+        DELETE FROM commentary
+        WHERE member_account = #{memberAccount}
+        AND comment_date = #{commentDate}
+    </delete>
+
+</mapper> 

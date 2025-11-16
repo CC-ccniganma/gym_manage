@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="adminCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="adminCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="adminCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">场地预约管理</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toAdminMain}">主页</a></li>
+                    <li class="breadcrumb-item active">场地预约管理</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 统计功能链接 -->
+                <div class="mb-4">
+                    <a th:href="@{/admin/toSiteStatistics}" class="btn btn-primary">
+                        <i class="fas fa-chart-bar"></i> 查看场地预约统计
+                    </a>
+                </div>
+
+                <!-- 场地预约总览 -->
+                <div class="row mb-4">
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">普通场地预约数</h5>
+                                <h2 class="display-4" th:text="${commonSiteCount}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">高级场地预约数</h5>
+                                <h2 class="display-4" th:text="${superSiteCount}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-info text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">总预约数</h5>
+                                <h2 class="display-4" th:text="${totalSiteCount}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 普通场地预约列表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        普通场地预约列表
+                    </div>
+                    <div class="card-body">
+                        <table id="commonSiteTable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>会员账号</th>
+                                <th>预约日期</th>
+                                <th>预约时段</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="reservation:${commonSiteList}">
+                                <td th:text="${reservation.memberAccount}">会员账号</td>
+                                <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}">预约日期</td>
+                                <td th:text="${reservation.period == 1 ? '上午 (9:00-12:00)' : 
+                                            (reservation.period == 2 ? '下午 (15:00-17:00)' : '晚上 (18:00-21:00)')}">预约时段</td>
+                                <td>
+                                    <a th:href="@{/admin/deleteCommonSiteReservation(memberAccount=${reservation.memberAccount},
+                                                                   reservationDateStr=${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')})}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('确定要取消此普通场地预约吗？')">
+                                        取消预约
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 高级场地预约列表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        高级场地预约列表
+                    </div>
+                    <div class="card-body">
+                        <table id="superSiteTable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>会员账号</th>
+                                <th>预约日期</th>
+                                <th>预约时段</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="reservation:${superSiteList}">
+                                <td th:text="${reservation.memberAccount}">会员账号</td>
+                                <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}">预约日期</td>
+                                <td th:text="${reservation.period == 1 ? '上午 (9:00-12:00)' : 
+                                            (reservation.period == 2 ? '下午 (15:00-17:00)' : '晚上 (18:00-21:00)')}">预约时段</td>
+                                <td>
+                                    <a th:href="@{/admin/deleteSuperSiteReservation(memberAccount=${reservation.memberAccount},
+                                                                   reservationDateStr=${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')})}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('确定要取消此高级场地预约吗？')">
+                                        取消预约
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="adminCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="adminCommon::common-scripts"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化表格
+        new simpleDatatables.DataTable("#commonSiteTable");
+        new simpleDatatables.DataTable("#superSiteTable");
+    });
+</script>
+</body>
+</html> 

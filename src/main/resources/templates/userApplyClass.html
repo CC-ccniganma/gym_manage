@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">课程预约</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toUserMain}">主页</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/user/toUserClass}">我的课程</a></li>
+                    <li class="breadcrumb-item active">课程预约</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 预约表单 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-plus me-1"></i>
+                        预约课程
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/user/applyClass}" method="post" id="reservationForm">
+                            <div class="mb-3">
+                                <label for="coachAccount" class="form-label">选择教练</label>
+                                <select class="form-select" id="coachAccount" name="coachAccount" required>
+                                    <option value="">请选择教练</option>
+                                    <option th:each="coach:${coachList}" 
+                                            th:value="${coach.coachAccount}"
+                                            th:text="${coach.coachName}">教练名称</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reservationDate" class="form-label">预约日期</label>
+                                <input type="date" class="form-control" id="reservationDate" name="reservationDateStr" 
+                                       th:min="${minDate}"
+                                       th:max="${maxDate}"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="period" class="form-label">预约时段</label>
+                                <select class="form-select" id="period" name="period" required>
+                                    <option value="">请选择时段</option>
+                                    <option value="1">上午 (9:00-12:00)</option>
+                                    <option value="2">下午 (15:00-17:00)</option>
+                                    <option value="3">晚上 (18:00-21:00)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">确认预约</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+
+<!-- 添加提示框脚本 -->
+<script th:inline="javascript">
+    // 获取URL参数
+    function getUrlParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // 显示提示框
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            <span>${message}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.card'));
+    }
+
+    // 页面加载时检查URL参数
+    document.addEventListener('DOMContentLoaded', function() {
+        const error = getUrlParam('error');
+        const success = getUrlParam('success');
+        
+        if (error) {
+            showAlert(error, 'danger');
+        }
+        if (success) {
+            showAlert(success, 'success');
+        }
+    });
+</script>
+</body>
+</html>

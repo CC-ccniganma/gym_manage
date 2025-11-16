@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">我的课程</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toUserMain}">主页</a></li>
+                    <li class="breadcrumb-item active">我的课程</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+                <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
+
+                <!-- 预约课程按钮 -->
+                <div class="mb-4">
+                    <a th:href="@{/user/toApplyClass}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        预约课程
+                    </a>
+                </div>
+
+                <!-- 已预约课程列表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        已预约课程
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>教练</th>
+                                <th>预约日期</th>
+                                <th>预约时段</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="reservation:${reservationList}">
+                                <td th:text="${reservation.coachName}">教练名称</td>
+                                <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}">预约日期</td>
+                                <td th:text="${reservation.period == 1 ? '上午 (9:00-12:00)' : 
+                                            (reservation.period == 2 ? '下午 (15:00-17:00)' : '晚上 (18:00-21:00)')}">预约时段</td>
+                                <td>
+                                    <a th:href="@{/user/delUserClass(memberAccount=${reservation.memberAccount},
+                                                                   coachAccount=${reservation.coachAccount},
+                                                                   reservationDateStr=${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')},
+                                                                   period=${reservation.period})}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('确定要取消预约吗？')">
+                                        取消预约
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+</body>
+</html>

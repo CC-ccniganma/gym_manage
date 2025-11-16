@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="adminCommon::common-header">
+    <title>教练课程统计</title>
+</head>
+<body class="sb-nav-fixed">
+<nav th:replace="adminCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="adminCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">教练课程统计</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toAdminMain}">主页</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/admin/toCourseReservation}">课程预约管理</a></li>
+                    <li class="breadcrumb-item active">教练课程统计</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 日期范围筛选表单 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-filter me-1"></i>
+                        选择统计范围
+                    </div>
+                    <div class="card-body">
+                        <form method="get" th:action="@{/admin/toCoachStatistics}" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="startDate" class="form-label">开始日期</label>
+                                <input type="date" class="form-control" id="startDate" name="startDateStr" th:value="${startDate}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDate" class="form-label">结束日期</label>
+                                <input type="date" class="form-control" id="endDate" name="endDateStr" th:value="${endDate}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="coachAccount" class="form-label">选择教练</label>
+                                <select class="form-select" id="coachAccount" name="coachAccount">
+                                    <option value="">全部教练</option>
+                                    <option th:each="coach : ${coachList.entrySet()}" 
+                                            th:value="${coach.key}" 
+                                            th:text="${coach.key + ' - ' + coach.value}"
+                                            th:selected="${coach.key == selectedCoachAccount}">
+                                        教练姓名
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">查询</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 统计总览 -->
+                <div class="row mb-4">
+                    <div class="col-xl-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">总课程数</h5>
+                                <h2 class="display-4" th:text="${totalCourses}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6" th:if="${selectedCoachAccount != null}">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${selectedCoach + ' 课程数'}">教练课程数</h5>
+                                <h2 class="display-4" th:text="${coachCourseStats.get(selectedCoachAccount + ' - ' + selectedCoach)}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 所有教练课程按时段统计 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-1"></i>
+                        所有教练课程按时段统计
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>时段</th>
+                                        <th>课程数量</th>
+                                        <th>百分比</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="entry : ${allCoachesPeriodStats}">
+                                        <td th:text="${entry.key}">时段</td>
+                                        <td th:text="${entry.value}">课程数量</td>
+                                        <td th:text="${totalCourses > 0 ? #numbers.formatPercent(entry.value / totalCourses, 1, 2) : '0%'}">百分比</td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr class="fw-bold">
+                                        <td>总计</td>
+                                        <td th:text="${totalCourses}">总课程数</td>
+                                        <td>100%</td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <canvas id="periodDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 特定教练时段分布（如果选择了特定教练才显示）-->
+                <div class="card mb-4" th:if="${selectedCoachAccount != null}">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        <span th:text="${selectedCoach + ' 时段分布'}">教练时段分布</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>时段</th>
+                                <th>课程数量</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry : ${coachPeriodStats}">
+                                <td th:text="${entry.key}">时段</td>
+                                <td th:text="${entry.value}">课程数量</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 教练课程详细数据 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        教练课程详细数据
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>教练</th>
+                                <th>课程数量</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry : ${coachCourseStats}">
+                                <td th:text="${entry.key}">教练信息</td>
+                                <td th:text="${entry.value}">课程数量</td>
+                                <td>
+                                    <a th:href="@{/admin/toCoachStatistics(startDateStr=${startDate},endDateStr=${endDate},coachAccount=${entry.key.split(' - ')[0]})}" 
+                                       class="btn btn-primary btn-sm">
+                                        查看时段分布
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr class="fw-bold">
+                                <td>总计</td>
+                                <td th:text="${totalCourses}">总课程数</td>
+                                <td></td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="adminCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="adminCommon::common-scripts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    // 设置默认时间范围（一周）
+    document.addEventListener('DOMContentLoaded', function() {
+        // 如果没有设置日期，设置默认值
+        if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) {
+            const today = new Date();
+            const weekAgo = new Date();
+            weekAgo.setDate(today.getDate() - 6);
+            
+            document.getElementById('endDate').valueAsDate = today;
+            document.getElementById('startDate').valueAsDate = weekAgo;
+        }
+        
+        // 初始化时段分布饼图
+        const periodStats = /*[[${allCoachesPeriodStats}]]*/ {};
+        if (periodStats) {
+            const ctx = document.getElementById('periodDistributionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(periodStats),
+                    datasets: [{
+                        data: Object.values(periodStats),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: '教练课程时段分布'
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html> 

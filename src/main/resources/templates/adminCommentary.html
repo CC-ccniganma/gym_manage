@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="adminCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="adminCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="adminCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">健身房评价管理</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toAdminMain}">主页</a></li>
+                    <li class="breadcrumb-item active">评价管理</li>
+                </ol>
+
+                <!-- 提示信息 -->
+                <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 评价列表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comments me-1"></i>
+                        所有会员评价
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${commentaryList != null and !commentaryList.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>会员账号</th>
+                                        <th>评价日期</th>
+                                        <th>评价内容</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="commentary : ${commentaryList}">
+                                        <td th:text="${commentary.memberAccount}"></td>
+                                        <td th:text="${#dates.format(commentary.commentDate, 'yyyy-MM-dd')}"></td>
+                                        <td th:text="${commentary.message}"></td>
+                                        <td>
+                                            <a th:href="@{/admin/deleteCommentary(memberAccount=${commentary.memberAccount}, commentDateStr=${#dates.format(commentary.commentDate, 'yyyy-MM-dd')})}"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('确定要删除这条评价吗？')">
+                                                <i class="fas fa-trash"></i> 删除
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:if="${commentaryList == null or commentaryList.isEmpty()}" class="text-center">
+                            <p>暂无评价记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="adminCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="adminCommon::common-scripts"></div>
+</body>
+</html> 

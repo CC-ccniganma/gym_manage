@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>场地预约</title>
+  <link href="/static/css/styles.css" th:href="@{/css/styles.css}" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+<!-- 公共头部和侧边栏 -->
+<div th:replace="userCommon :: common-navbar"></div>
+<div id="layoutSidenav">
+  <div th:replace="userCommon :: common-sidenav"></div>
+  <div id="layoutSidenav_content">
+    <main class="container mt-4">
+      <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+      <h2>场地预约</h2>
+      <!-- 新增预约表单 -->
+      <form th:action="@{/user/addSiteReservation}" method="post" class="row g-3 mb-4">
+        <input type="hidden" name="memberAccount" th:value="${member.memberAccount}"/>
+        <div class="col-md-3">
+          <label for="reservationType" class="form-label">预约类型</label>
+          <select class="form-select" id="reservationType" name="reservationType" required>
+            <option value="common">普通预约</option>
+            <option value="super">特权预约</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="reservationDate" class="form-label">预约日期</label>
+          <input type="date" class="form-control" id="reservationDate" name="reservationDate" required th:attr="min=${minDate},max=${maxDate}">
+        </div>
+        <div class="col-md-3">
+          <label for="period" class="form-label">预约时段</label>
+          <select class="form-select" id="period" name="period" required>
+            <option value="1">上午</option>
+            <option value="2">下午</option>
+            <option value="3">晚上</option>
+          </select>
+        </div>
+        <div class="col-md-3 align-self-end">
+          <button type="submit" class="btn btn-primary">提交预约</button>
+        </div>
+      </form>
+      <!-- 预约记录列表 -->
+      <h3>普通预约记录</h3>
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>预约日期</th>
+          <th>预约时段</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${commonReservationList}">
+          <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}"></td>
+          <td th:switch="${reservation.period}">
+            <span th:case="1">上午（9：00-12：00）</span>
+            <span th:case="2">下午（15：00-17：00）</span>
+            <span th:case="3">晚上（18：00-21：00）</span>
+            <span th:case="*">未知</span>
+          </td>
+          <td>
+            <form th:action="@{/user/deleteSiteReservation}" method="post" style="display:inline;">
+              <input type="hidden" name="memberAccount" th:value="${reservation.memberAccount}"/>
+              <input type="hidden" name="reservationDate" th:value="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}"/>
+              <input type="hidden" name="reservationType" value="common"/>
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要取消该预约吗？')">取消</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(commonReservationList)}">
+          <td colspan="3" class="text-center">暂无普通预约记录</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>特权预约记录</h3>
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>预约日期</th>
+          <th>预约时段</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${superReservationList}">
+          <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}"></td>
+          <td th:switch="${reservation.period}">
+            <span th:case="1">上午（9：00-12：00）</span>
+            <span th:case="2">下午（15：00-17：00）</span>
+            <span th:case="3">晚上（18：00-21：00）</span>
+            <span th:case="*">未知</span>
+          </td>
+          <td>
+            <form th:action="@{/user/deleteSiteReservation}" method="post" style="display:inline;">
+              <input type="hidden" name="memberAccount" th:value="${reservation.memberAccount}"/>
+              <input type="hidden" name="reservationDate" th:value="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}"/>
+              <input type="hidden" name="reservationType" value="super"/>
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要取消该预约吗？')">取消</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(superReservationList)}">
+          <td colspan="3" class="text-center">暂无特权预约记录</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <h3>预约签到</h3>
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>预约日期</th>
+          <th>预约时段</th>
+          <th>是否已签到</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${signInReservationList}">
+          <td th:text="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}"></td>
+          <td th:switch="${reservation.period}">
+            <span th:case="1">上午</span>
+            <span th:case="2">下午</span>
+            <span th:case="3">晚上</span>
+            <span th:case="*">未知</span>
+          </td>
+          <td>
+            <span th:if="${reservation.signedIn}">已签到</span>
+            <span th:unless="${reservation.signedIn}">未签到</span>
+          </td>
+          <td>
+            <form th:action="@{/user/signInReservation}" method="post" style="display:inline;" th:if="${!reservation.signedIn}">
+              <input type="hidden" name="reservationDate" th:value="${#dates.format(reservation.reservationDate, 'yyyy-MM-dd')}" />
+              <input type="hidden" name="memberAccount" th:value="${reservation.memberAccount}" />
+              <input type="hidden" name="period" th:value="${reservation.period}" />
+              <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('确定要签到吗？')">签到</button>
+            </form>
+            <span th:if="${reservation.signedIn}">-</span>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(signInReservationList)}">
+          <td colspan="4" class="text-center">暂无可签到预约</td>
+        </tr>
+        </tbody>
+      </table>
+
+
+    </main>
+    <footer th:replace="userCommon :: common-footer"></footer>
+  </div>
+</div>
+<div th:replace="userCommon :: common-scripts"></div>
+</body>
+</html>

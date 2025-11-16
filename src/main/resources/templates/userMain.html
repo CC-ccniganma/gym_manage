@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4" th:text="${member.memberName} + '的主页'"></h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item active">生命不息，运动不止</li>
+                </ol>
+
+                <!-- 在下方插入图片，src属性留空，待后续补充图片路径 -->
+                <div class="text-center my-4">
+                    <img id="main-image" src="/img/userMainPic.jpg" alt="主页图片" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" />
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+</body>
+</html>

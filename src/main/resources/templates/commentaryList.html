@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<!-- 根据不同用户类型引入不同的布局 -->
+<head th:replace="${userType == 'admin' ? 'adminCommon' : (userType == 'coach' ? 'coachCommon' : 'userCommon')}::common-header"></head>
+<body class="sb-nav-fixed">
+
+<!-- 根据不同用户类型引入不同的导航 -->
+<nav th:replace="${userType == 'admin' ? 'adminCommon' : (userType == 'coach' ? 'coachCommon' : 'userCommon')}::common-navbar"></nav>
+<div id="layoutSidenav">
+    <!-- 根据不同用户类型引入不同的侧边栏 -->
+    <div th:replace="${userType == 'admin' ? 'adminCommon' : (userType == 'coach' ? 'coachCommon' : 'userCommon')}::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">健身房评价</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item">
+                        <a th:href="${userType == 'admin' ? '/toAdminMain' : (userType == 'coach' ? '/toCoachMain' : '/toUserMain')}">主页</a>
+                    </li>
+                    <li class="breadcrumb-item active">健身房评价</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 如果是会员显示添加评价按钮 -->
+                <div class="mb-4" th:if="${isMember}">
+                    <a th:href="@{/commentary-view/toAdd}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> 添加评价
+                    </a>
+                </div>
+
+                <!-- 评价列表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comment me-1"></i>
+                        会员评价列表
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>会员</th>
+                                <th>评价内容</th>
+                                <th>评价日期</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="commentary : ${commentaryList}" th:if="${commentaryList != null && !commentaryList.isEmpty()}">
+                                <td th:text="${commentary.memberAccount}">会员账号</td>
+                                <td th:text="${commentary.message != null ? commentary.message : ''}">评价内容</td>
+                                <td th:text="${commentary.commentDate != null ? #dates.format(commentary.commentDate, 'yyyy-MM-dd') : ''}">评价日期</td>
+                                <td>
+                                    <!-- 只有会员可以删除自己的评价 -->
+                                    <a th:if="${isMember && memberAccount == commentary.memberAccount}"
+                                       th:href="@{/commentary-view/delete/{memberAccount}/{commentDate}(memberAccount=${commentary.memberAccount},commentDate=${#dates.format(commentary.commentDate, 'yyyy-MM-dd')})}"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('确定要删除此评价吗？')">
+                                        删除
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${commentaryList == null || commentaryList.isEmpty()}">
+                                <td colspan="4" class="text-center">暂无评价</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 根据不同用户类型引入不同的页脚 -->
+        <footer th:replace="${userType == 'admin' ? 'adminCommon' : (userType == 'coach' ? 'coachCommon' : 'userCommon')}::common-footer"></footer>
+    </div>
+</div>
+
+<!-- 引入相应的脚本 -->
+<div th:include="${userType == 'admin' ? 'adminCommon' : (userType == 'coach' ? 'coachCommon' : 'userCommon')}::common-scripts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+<script src="/static/js/datatables-simple-demo.js" th:src="@{/js/datatables-simple-demo.js}"></script>
+</body>
+</html> 

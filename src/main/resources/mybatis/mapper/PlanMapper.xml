@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milotnt.mapper.PlanMapper">
+
+    <!-- 查询所有健身计划 -->
+    <select id="findAll" resultType="com.milotnt.pojo.Plan">
+        SELECT p.*, m.member_name as memberName, c.coach_name as coachName
+        FROM plan p 
+        JOIN member m ON p.member_account = m.member_account
+        JOIN coach c ON p.coach_account = c.coach_account
+    </select>
+
+    <!-- 根据会员账号查询健身计划 -->
+    <select id="findByMemberAccount" parameterType="java.lang.Integer" resultType="com.milotnt.pojo.Plan">
+        SELECT p.*, m.member_name as memberName, c.coach_name as coachName
+        FROM plan p 
+        JOIN member m ON p.member_account = m.member_account
+        JOIN coach c ON p.coach_account = c.coach_account
+        WHERE p.member_account = #{memberAccount}
+    </select>
+
+    <!-- 根据教练账号查询健身计划 -->
+    <select id="findByCoachAccount" parameterType="java.lang.Integer" resultType="com.milotnt.pojo.Plan">
+        SELECT p.*, m.member_name as memberName, c.coach_name as coachName
+        FROM plan p 
+        JOIN member m ON p.member_account = m.member_account
+        JOIN coach c ON p.coach_account = c.coach_account
+        WHERE p.coach_account = #{coachAccount}
+    </select>
+
+    <!-- 添加健身计划 -->
+    <insert id="insertPlan" parameterType="com.milotnt.pojo.Plan">
+        INSERT INTO plan (member_account, coach_account, message) 
+        VALUES (#{memberAccount}, #{coachAccount}, #{message})
+    </insert>
+
+    <!-- 修改健身计划 -->
+    <update id="updatePlan" parameterType="com.milotnt.pojo.Plan">
+        UPDATE plan 
+        SET coach_account = #{coachAccount}, message = #{message}
+        WHERE member_account = #{memberAccount}
+    </update>
+
+    <!-- 删除健身计划 -->
+    <delete id="deletePlan" parameterType="java.lang.Integer">
+        DELETE FROM plan 
+        WHERE member_account = #{memberAccount}
+    </delete>
+
+</mapper> 

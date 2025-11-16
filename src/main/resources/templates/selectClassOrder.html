@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="adminCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="adminCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="adminCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">预约信息</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toAdminMain}">主页</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/class/selClass}">课程管理</a></li>
+                    <li class="breadcrumb-item active">预约信息</li>
+                </ol>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        预约信息表
+                    </div>
+                    <div class="card-body">
+                        <!--当reservationList为空（该课程无人预约）时显示-->
+                        <div th:if="${#lists.isEmpty(reservationList)}">
+                            <div class="alert alert-info" role="alert">
+                                暂无预约信息！
+                            </div>
+                        </div>
+
+                        <!--当reservationList不为空（该课程已有人预约）时显示-->
+                        <div th:if="${not #lists.isEmpty(reservationList)}">
+                            <div class="mb-4">
+                                <h5>课程信息</h5>
+                                <p>教练账号：<span th:text="${coachAccount}"></span></p>
+                                <p>预约日期：<span th:text="${reservationDate}"></span></p>
+                            </div>
+
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>会员账号</th>
+                                    <th>预约时段</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="reservation:${reservationList}">
+                                    <td th:text="${reservation.memberAccount}">会员账号</td>
+                                    <td th:text="${reservation.period == 1 ? '上午 (9:00-12:00)' : (reservation.period == 2 ? '下午 (15:00-17:00)' : '晚上 (18:00-21:00)')}">预约时段</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <a th:href="@{/class/selClass}" class="btn btn-outline-secondary">
+                                返回课程列表
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="adminCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="adminCommon::common-scripts"></div>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="adminCommon::common-header">
+    <title>场地预约统计</title>
+</head>
+<body class="sb-nav-fixed">
+<nav th:replace="adminCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="adminCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">场地预约统计</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toAdminMain}">主页</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/admin/toSiteReservation}">场地预约管理</a></li>
+                    <li class="breadcrumb-item active">场地预约统计</li>
+                </ol>
+
+                <!-- 显示错误或成功消息 -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- 日期范围筛选表单 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-filter me-1"></i>
+                        选择统计范围
+                    </div>
+                    <div class="card-body">
+                        <form method="get" th:action="@{/admin/toSiteStatistics}" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="startDate" class="form-label">开始日期</label>
+                                <input type="date" class="form-control" id="startDate" name="startDateStr" th:value="${startDate}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="endDate" class="form-label">结束日期</label>
+                                <input type="date" class="form-control" id="endDate" name="endDateStr" th:value="${endDate}">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">查询</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 统计总览 -->
+                <div class="row mb-4">
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">普通场地预约数</h5>
+                                <h2 class="display-4" th:text="${commonTotal}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">高级场地预约数</h5>
+                                <h2 class="display-4" th:text="${superTotal}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <div class="card bg-info text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">总预约数</h5>
+                                <h2 class="display-4" th:text="${allTotal}">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按时段统计 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-1"></i>
+                        场地预约按时段统计
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>时段</th>
+                                        <th>预约人次</th>
+                                        <th>百分比</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="entry : ${periodStats}">
+                                        <td th:text="${entry.key}">时段</td>
+                                        <td th:text="${entry.value}">预约人次</td>
+                                        <td th:text="${allTotal > 0 ? #numbers.formatPercent(entry.value / allTotal, 1, 2) : '0%'}">百分比</td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr class="fw-bold">
+                                        <td>总计</td>
+                                        <td th:text="${allTotal}">总预约数</td>
+                                        <td>100%</td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <canvas id="periodDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详细数据表格 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        场地预约详细数据（按日期）
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>普通场地预约人次</th>
+                                <th>高级场地预约人次</th>
+                                <th>总计预约人次</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="entry : ${allSiteStats}">
+                                <td th:text="${entry.key}">日期</td>
+                                <td th:text="${commonSiteStats.containsKey(entry.key) ? commonSiteStats.get(entry.key) : 0}">普通场地预约人次</td>
+                                <td th:text="${superSiteStats.containsKey(entry.key) ? superSiteStats.get(entry.key) : 0}">高级场地预约人次</td>
+                                <td th:text="${entry.value}">总计预约人次</td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr class="fw-bold">
+                                <td>总计</td>
+                                <td th:text="${commonTotal}">普通场地总计</td>
+                                <td th:text="${superTotal}">高级场地总计</td>
+                                <td th:text="${allTotal}">总计</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="adminCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="adminCommon::common-scripts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置默认时间范围（一周）
+        if (!document.getElementById('startDate').value || !document.getElementById('endDate').value) {
+            const today = new Date();
+            const weekAgo = new Date();
+            weekAgo.setDate(today.getDate() - 6);
+            
+            document.getElementById('endDate').valueAsDate = today;
+            document.getElementById('startDate').valueAsDate = weekAgo;
+        }
+        
+        // 初始化时段分布饼图
+        const periodStats = /*[[${periodStats}]]*/ {};
+        if (periodStats) {
+            const ctx = document.getElementById('periodDistributionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(periodStats),
+                    datasets: [{
+                        data: Object.values(periodStats),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5, // 控制图表的宽高比，较小的值使图表更紧凑
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: '场地预约时段分布'
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html> 

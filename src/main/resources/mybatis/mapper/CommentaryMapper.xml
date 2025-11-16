@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milotnt.mapper.CommentaryMapper">
+
+    <!-- 查询所有评价 - 使用LEFT JOIN确保即使没有关联会员也能显示评价 -->
+    <select id="findAll" resultType="com.milotnt.pojo.Commentary">
+        SELECT 
+            c.member_account as memberAccount, 
+            c.message as message, 
+            c.comment_date as commentDate, 
+            IFNULL(m.member_name, '未知会员') as memberName
+        FROM 
+            commentary c
+        LEFT JOIN 
+            member m ON c.member_account = m.member_account
+        ORDER BY 
+            c.comment_date DESC
+    </select>
+
+    <!-- 根据会员账号查询评价 -->
+    <select id="findByMemberAccount" parameterType="java.lang.Integer" resultType="com.milotnt.pojo.Commentary">
+        SELECT 
+            c.member_account as memberAccount, 
+            c.message as message, 
+            c.comment_date as commentDate, 
+            IFNULL(m.member_name, '未知会员') as memberName
+        FROM 
+            commentary c
+        LEFT JOIN 
+            member m ON c.member_account = m.member_account
+        WHERE 
+            c.member_account = #{memberAccount}
+        ORDER BY 
+            c.comment_date DESC
+    </select>
+
+    <!-- 添加评价 -->
+    <insert id="insertCommentary" parameterType="com.milotnt.pojo.Commentary">
+        INSERT INTO commentary (member_account, message, comment_date)
+        VALUES (#{memberAccount}, #{message}, #{commentDate})
+    </insert>
+
+    <!-- 删除评价 -->
+    <delete id="deleteCommentary">
+        DELETE FROM commentary
+        WHERE member_account = #{memberAccount} AND comment_date = #{commentDate}
+    </delete>
+
+    <select id="selectByMemberAccount" resultType="com.milotnt.pojo.Commentary">
+        SELECT *
+        FROM commentary
+        WHERE member_account = #{memberAccount}
+        ORDER BY comment_date DESC
+    </select>
+
+    <select id="selectAll" resultType="com.milotnt.pojo.Commentary">
+        SELECT *
+        FROM commentary
+        ORDER BY comment_date DESC
+    </select>
+
+</mapper> 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">添加评价</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toUserMain}">主页</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/commentary-view/list}">健身房评价</a></li>
+                    <li class="breadcrumb-item active">添加评价</li>
+                </ol>
+
+                <!-- 添加评价表单 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comment-plus me-1"></i>
+                        发表您的评价
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/commentary-view/add}" method="post" id="addCommentaryForm">
+                            <div class="mb-3">
+                                <label for="memberName" class="form-label">会员姓名</label>
+                                <input type="text" class="form-control" id="memberName" th:value="${memberName}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">评价内容</label>
+                                <textarea class="form-control" id="message" name="message" rows="6" required
+                                          placeholder="请输入您对健身房的评价..."></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">提交评价</button>
+                                <a th:href="@{/commentary-view/list}" class="btn btn-secondary">返回</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+</body>
+</html> 

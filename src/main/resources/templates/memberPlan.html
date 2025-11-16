@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">我的健身计划</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toUserMain}">主页</a></li>
+                    <li class="breadcrumb-item active">健身计划</li>
+                </ol>
+
+                <!-- 健身计划内容 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-clipboard-list me-1"></i>
+                        我的健身计划
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${plan != null}">
+                            <table class="table table-hover">
+                                <tr>
+                                    <td style="width: 20%"><strong>会员姓名</strong></td>
+                                    <td th:text="${plan.memberName}">会员姓名</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>教练姓名</strong></td>
+                                    <td th:text="${plan.coachName}">教练姓名</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>健身计划内容</strong></td>
+                                    <td>
+                                        <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;" th:text="${plan.message}">健身计划内容</pre>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div th:if="${plan == null}" class="alert alert-info text-center">
+                            <p>您还没有健身计划</p>
+                            <p>请联系教练为您定制专属健身计划</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+</body>
+</html> 

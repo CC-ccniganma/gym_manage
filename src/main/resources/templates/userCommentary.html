@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="userCommon::common-header"></head>
+<body class="sb-nav-fixed">
+<nav th:replace="userCommon::common-navbar"></nav>
+<div id="layoutSidenav">
+    <div th:replace="userCommon::common-sidenav"></div>
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">健身房评价</h1>
+
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a th:href="@{/toUserMain}">主页</a></li>
+                    <li class="breadcrumb-item active">健身房评价</li>
+                </ol>
+
+                <!-- 评价表单 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comment me-1"></i>
+                        发表评价
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/user/submitCommentary}" method="post" id="commentaryForm">
+                            <div class="mb-3">
+                                <label for="message" class="form-label">评价内容</label>
+                                <textarea class="form-control" id="message" name="message" rows="3" required
+                                          maxlength="255" placeholder="请输入您的评价（最多255字）"></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">提交评价</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 评价历史记录 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-history me-1"></i>
+                        我的评价历史
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${commentaryList != null and !commentaryList.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>评价日期</th>
+                                        <th>评价内容</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="commentary : ${commentaryList}">
+                                        <td th:text="${#dates.format(commentary.commentDate, 'yyyy-MM-dd')}"></td>
+                                        <td th:text="${commentary.message}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:if="${commentaryList == null or commentaryList.isEmpty()}" class="text-center">
+                            <p>暂无评价记录</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 所有会员评价 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comments me-1"></i>
+                        所有会员评价
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${allCommentaryList != null and !allCommentaryList.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>会员账号</th>
+                                        <th>评价日期</th>
+                                        <th>评价内容</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="commentary : ${allCommentaryList}">
+                                        <td th:text="${commentary.memberAccount}"></td>
+                                        <td th:text="${#dates.format(commentary.commentDate, 'yyyy-MM-dd')}"></td>
+                                        <td th:text="${commentary.message}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:if="${allCommentaryList == null or allCommentaryList.isEmpty()}" class="text-center">
+                            <p>暂无评价记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="userCommon::common-footer"></footer>
+    </div>
+</div>
+
+<div th:include="userCommon::common-scripts"></div>
+</body>
+</html> 

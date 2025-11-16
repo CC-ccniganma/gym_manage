@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milotnt.mapper.SignInMapper">
+    <insert id="insertSignIn" parameterType="com.milotnt.pojo.SignIn">
+        INSERT INTO sign_in (member_account, sign_in_date, period, sign_in_time)
+        VALUES (#{memberAccount}, #{signInDate}, #{period}, #{signInTime})
+    </insert>
+    <select id="countSignIn" resultType="int">
+        SELECT COUNT(*) FROM sign_in
+        WHERE member_account = #{memberAccount}
+          AND sign_in_date = #{signInDate}
+          AND period = #{period}
+    </select>
+</mapper>

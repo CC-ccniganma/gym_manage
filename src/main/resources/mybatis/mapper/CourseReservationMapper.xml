@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.milotnt.mapper.CourseReservationMapper">
+
+    <resultMap id="CourseReservationMap" type="com.milotnt.pojo.CourseReservation">
+        <id property="memberAccount" column="member_account"/>
+        <id property="coachAccount" column="coach_account"/>
+        <id property="reservationDate" column="reservation_date"/>
+        <id property="period" column="period"/>
+        <result property="memberName" column="member_name"/>
+        <result property="coachName" column="coach_name"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="CourseReservationMap">
+        SELECT r.*, m.member_name, c.coach_name
+        FROM course_reservation r
+        LEFT JOIN member m ON r.member_account = m.member_account
+        LEFT JOIN coach c ON r.coach_account = c.coach_account
+    </select>
+
+    <select id="selectByMemberAccount" resultMap="CourseReservationMap">
+        SELECT r.*, m.member_name, c.coach_name
+        FROM course_reservation r
+        LEFT JOIN member m ON r.member_account = m.member_account
+        LEFT JOIN coach c ON r.coach_account = c.coach_account
+        WHERE r.member_account = #{memberAccount}
+    </select>
+
+    <select id="selectByCoachAccount" resultMap="CourseReservationMap">
+        SELECT r.*, m.member_name, c.coach_name
+        FROM course_reservation r
+        LEFT JOIN member m ON r.member_account = m.member_account
+        LEFT JOIN coach c ON r.coach_account = c.coach_account
+        WHERE r.coach_account = #{coachAccount}
+    </select>
+
+    <select id="isReservationExists" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM course_reservation
+        WHERE member_account = #{memberAccount}
+        AND coach_account = #{coachAccount}
+        AND reservation_date = #{reservationDate}
+        AND period = #{period}
+    </select>
+
+    <insert id="insertReservation" parameterType="com.milotnt.pojo.CourseReservation">
+        INSERT INTO course_reservation(member_account, coach_account, reservation_date, period)
+        VALUES (#{memberAccount}, #{coachAccount}, #{reservationDate}, #{period})
+    </insert>
+
+    <delete id="deleteReservation" parameterType="com.milotnt.pojo.CourseReservation">
+        DELETE FROM course_reservation
+        WHERE member_account = #{memberAccount}
+        AND coach_account = #{coachAccount}
+        AND reservation_date = #{reservationDate}
+        AND period = #{period}
+    </delete>
+
+    <select id="selectByCoachAndDate" resultMap="CourseReservationMap">
+        SELECT r.*, m.member_name, c.coach_name
+        FROM course_reservation r
+        LEFT JOIN member m ON r.member_account = m.member_account
+        LEFT JOIN coach c ON r.coach_account = c.coach_account
+        WHERE r.coach_account = #{coachAccount}
+        AND r.reservation_date = #{reservationDate}
+    </select>
+
+    <select id="checkReservationExists" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM course_reservation
+        WHERE member_account = #{memberAccount}
+        AND coach_account = #{coachAccount}
+        AND reservation_date = #{reservationDate}
+        AND period = #{period}
+    </select>
+
+    <select id="findByMemberAccount" resultMap="CourseReservationMap">
+        SELECT r.*, m.member_name, c.coach_name
+        FROM course_reservation r
+        LEFT JOIN member m ON r.member_account = m.member_account
+        LEFT JOIN coach c ON r.coach_account = c.coach_account
+        WHERE r.member_account = #{memberAccount}
+    </select>
+
+    <insert id="addReservation">
+        INSERT INTO course_reservation (member_account, coach_account, reservation_date, period)
+        VALUES (#{memberAccount}, #{coachAccount}, #{reservationDate}, #{period})
+    </insert>
+
+</mapper>
