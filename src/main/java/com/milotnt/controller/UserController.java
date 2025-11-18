@@ -167,8 +167,12 @@ public class UserController {
         member.setCardNextClass(member1.getCardNextClass());
         member.setIsSuper(member1.getIsSuper());
 
-        // 如果密码不为空且不是已加密格式，则加密密码
-        if (member.getMemberPassword() != null && !member.getMemberPassword().isEmpty()) {
+        // 处理密码更新逻辑
+        if (member.getMemberPassword() == null || member.getMemberPassword().trim().isEmpty()) {
+            // 如果密码为空，保持原密码不变（使用session中的加密密码）
+            member.setMemberPassword(member1.getMemberPassword());
+        } else {
+            // 如果密码不为空，加密新密码
             if (!PasswordEncoder.isEncoded(member.getMemberPassword())) {
                 member.setMemberPassword(PasswordEncoder.encode(member.getMemberPassword()));
             }
@@ -176,8 +180,13 @@ public class UserController {
 
         try {
             if (memberService.updateMemberByMemberAccount(member)) {
-                // 更新成功后，更新session中的会员信息
-                session.setAttribute("member", member);
+                // 从数据库重新获取更新后的会员信息，确保数据同步
+                List<Member> updatedMemberList = memberService.selectByMemberAccount(member.getMemberAccount());
+                if (updatedMemberList != null && !updatedMemberList.isEmpty()) {
+                    Member updatedMember = updatedMemberList.get(0);
+                    // 更新session中的会员信息
+                    session.setAttribute("member", updatedMember);
+                }
                 return "redirect:/user/toUserInfo?success=" + URLEncoder.encode("修改成功", "UTF-8");
             } else {
                 return "redirect:/user/toUserInfo?error=" + URLEncoder.encode("修改失败", "UTF-8");

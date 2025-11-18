@@ -35,8 +35,17 @@
                             </tr>
                             <tr>
                                 <td text-align="center">密码：</td>
-                                <td><input type="text" class="form-control" th:value="${member.memberPassword}"
-                                           name="memberPassword">
+                                <td>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" 
+                                               id="memberPassword"
+                                               name="memberPassword" 
+                                               autocomplete="new-password">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <span id="toggleIcon">👁️</span>
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted">留空则不修改密码，输入新密码将替换原密码</small>
                                 </td>
                             </tr>
                             <tr>
@@ -97,6 +106,27 @@
         }
         return true;
     }
+
+    // 显示/隐藏密码功能
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('memberPassword');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // 切换图标
+                if (type === 'text') {
+                    toggleIcon.textContent = '🙈';
+                } else {
+                    toggleIcon.textContent = '👁️';
+                }
+            });
+        }
+    });
 </script>
 </body>
 </html>
