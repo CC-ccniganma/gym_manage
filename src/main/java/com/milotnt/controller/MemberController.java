@@ -89,6 +89,12 @@ public class MemberController {
     //修改会员信息
     @RequestMapping("/updateMember")
     public String updateMember(Member member) {
+        // 如果密码不为空且不是已加密格式，则加密密码
+        if (member.getMemberPassword() != null && !member.getMemberPassword().isEmpty()) {
+            if (!PasswordEncoder.isEncoded(member.getMemberPassword())) {
+                member.setMemberPassword(PasswordEncoder.encode(member.getMemberPassword()));
+            }
+        }
         memberService.updateMemberByMemberAccount(member);
         return "redirect:selMember";
     }

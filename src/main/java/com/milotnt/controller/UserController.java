@@ -12,6 +12,7 @@ import com.milotnt.pojo.CommonSiteReservation;
 import com.milotnt.pojo.SuperSiteReservation;
 import com.milotnt.service.MemberService;
 import com.milotnt.service.CoachService;
+import com.milotnt.util.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -165,6 +166,13 @@ public class UserController {
         member.setCardTime(member1.getCardTime());
         member.setCardNextClass(member1.getCardNextClass());
         member.setIsSuper(member1.getIsSuper());
+
+        // 如果密码不为空且不是已加密格式，则加密密码
+        if (member.getMemberPassword() != null && !member.getMemberPassword().isEmpty()) {
+            if (!PasswordEncoder.isEncoded(member.getMemberPassword())) {
+                member.setMemberPassword(PasswordEncoder.encode(member.getMemberPassword()));
+            }
+        }
 
         try {
             if (memberService.updateMemberByMemberAccount(member)) {

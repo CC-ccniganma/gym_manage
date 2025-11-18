@@ -26,4 +26,16 @@ public class PasswordEncoder {
         }
         return encoder.matches(rawPassword, encodedPassword);
     }
+
+    /**
+     * 检查密码是否已经是加密格式（BCrypt加密后的密码通常以$2a$、$2b$或$2y$开头，长度为60）
+     * @param password 密码字符串
+     * @return 如果已经是加密格式返回true，否则返回false
+     */
+    public static boolean isEncoded(String password) {
+        if (password == null || password.isEmpty()) {
+            return false;
+        }
+        return password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$");
+    }
 } 

@@ -16,10 +16,10 @@
     </select>
 
     <insert id="insertMember" parameterType="member">
-        INSERT INTO member (member_account, member_name, member_gender, member_age, member_height,
+        INSERT INTO member (member_account, member_password, member_name, member_gender, member_age, member_height,
                             member_weight, member_phone, card_time, card_class,
                             card_next_class,is_super)
-        VALUES (#{memberAccount}, #{memberName}, #{memberGender}, #{memberAge}, #{memberHeight},
+        VALUES (#{memberAccount}, #{memberPassword}, #{memberName}, #{memberGender}, #{memberAge}, #{memberHeight},
                 #{memberWeight}, #{memberPhone}, #{cardTime}, #{cardClass}, #{cardNextClass},#{isSuper})
     </insert>
 
